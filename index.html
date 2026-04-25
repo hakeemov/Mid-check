@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediCheck — Smart Symptom Checker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ───── HEADER ───── -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#" onclick="showPage('checker')">
+      <div class="logo-icon">🏥</div>
+      <span class="logo-text">Medi<span>Check</span></span>
+    </a>
+    <nav>
+      <button class="nav-btn active" id="nav-checker" onclick="showPage('checker')">Symptom Checker</button>
+      <button class="nav-btn" id="nav-history" onclick="showPage('history'); loadHistory()">History</button>
+    </nav>
+  </div>
+</header>
+
+<!-- PAGE: CHECKER -->
+<div id="page-checker" class="page active">
+  <section class="hero">
+    <div class="hero-dots"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">⚕️ &nbsp; AI-Powered Analysis</div>
+      <h1>Understand Your Symptoms <em>Instantly</em></h1>
+      <p>Enter your details and symptoms for a preliminary assessment. Our AI engine analyzes patterns to suggest possible conditions.</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon">📋</div>
+        <div class="card-header-text">
+          <h2>Patient Information</h2>
+          <p>Fill in your details to begin the assessment</p>
+        </div>
+      </div>
+
+      <div class="card-body" id="form-section">
+        <div class="disclaimer">
+          <span class="disc-icon">⚠️</span>
+          <div>
+            <strong>Medical Disclaimer</strong>
+            This tool does not provide a medical diagnosis. Results are for informational purposes only.
+            <strong>Always consult a qualified doctor</strong> for any health concerns.
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" id="patient-name" placeholder="e.g. Ahmed Abdelgadir" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label>Age <span class="req">*</span></label>
+            <input type="number" id="patient-age" placeholder="e.g. 24" min="1" max="120" />
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:1.25rem;">
+          <label>Gender</label>
+          <select id="patient-gender">
+            <option value="">Prefer not to say</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>
+            Symptoms <span class="req">*</span>
+            &nbsp;<span class="label-hint">Type and press Enter or comma</span>
+          </label>
+          <div class="symptoms-wrap">
+            <div class="symptoms-tags" id="symptoms-container"
+                 onclick="document.getElementById('symptom-input').focus()">
+              <input type="text" id="symptom-input" class="tag-input"
+                     placeholder="e.g. headache, fever..." autocomplete="off" />
+            </div>
+            <div class="autocomplete-list" id="autocomplete-list"></div>
+          </div>
+        </div>
+
+        <div class="quick-add-wrap">
+          <div class="section-label">Quick Add Common Symptoms</div>
+          <div id="quick-symptoms"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button class="btn-primary" id="submit-btn" onclick="analyzeSymptoms()">
+          <span>🔍</span> Analyze Symptoms
+        </button>
+      </div>
+
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="pulse-ring"><div class="pulse-dot"></div></div>
+        <div class="loading-text">
+          Analyzing your symptoms…
+          <div class="loading-step" id="loading-step">Connecting to AI engine</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="results-section" style="margin-top:1.75rem;">
+      <div class="card">
+        <div class="card-header results-card-header">
+          <div class="card-header-icon">📊</div>
+          <div class="card-header-text">
+            <h2>Diagnosis Results</h2>
+            <p>Possible conditions based on your symptoms</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="results-header">
+            <div class="rh-icon">👤</div>
+            <div>
+              <h3 id="res-patient-name">—</h3>
+              <p id="res-patient-meta">—</p>
+            </div>
+          </div>
+
+          <div class="patient-summary" id="patient-summary"></div>
+
+          <div class="section-label">Possible Conditions</div>
+          <div class="disease-cards" id="disease-cards"></div>
+
+          <div class="results-disclaimer">
+            ⚠️ <strong>This is not a medical diagnosis.</strong>
+            Please consult a qualified healthcare professional for accurate diagnosis and treatment.
+          </div>
+
+          <div class="results-actions">
+            <button class="btn-outline" onclick="resetForm()">🔄 New Assessment</button>
+            <button class="btn-outline" onclick="showPage('history'); loadHistory()">📋 View History</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: HISTORY -->
+<div id="page-history" class="page">
+  <div class="page-container">
+    <h1 class="page-title">Diagnosis History</h1>
+    <p class="page-subtitle">All past assessments saved to your database</p>
+
+    <div id="history-container">
+      <div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <div class="empty-title">No records yet</div>
+        <div class="empty-desc">Submit a symptom assessment to see results here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDznWRQs1BIyOaDzYS_nL9acw6NHSXn3YY",
+    authDomain: "mid-check-27a90.firebaseapp.com",
+    projectId: "mid-check-27a90",
+    storageBucket: "mid-check-27a90.firebasestorage.app",
+    messagingSenderId: "1082354962631",
+    appId: "1:1082354962631:web:1cdb73bb835612747@eee2"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>
